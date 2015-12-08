@@ -185,7 +185,42 @@ public class KyleDB {
                     String field = user_input.substring(14, user_input.length() - 1);
                     System.out.printf("Sort on %s\n\n>> ",field);
                 } else if(user_input.toLowerCase().startsWith("db.CS557.delete".toLowerCase()) && user_input.endsWith(")")) {
-                    System.out.printf("Delete\n\n>> ");
+                    String input = user_input.substring(16, user_input.length() - 1);
+                    ArrayList<Integer> result_ids = new ArrayList<Integer>();
+                    boolean firstpass = true;
+
+                    if(input.contains("<")) {
+                        String[] query = input.split("\\<");
+                        for (int k = 0; k < storage.size(); k++) {
+                            String key = query[0].toLowerCase().trim();
+                            if(storage.get(k).contains(key) && (Integer.valueOf(storage.get(k).get(key)) < Integer.valueOf(query[1].trim()))) {
+                                result_ids.add(k);
+                            }
+                        }
+                    } else if(input.contains(">")) {
+                        String[] query = input.split("\\>");
+                        for (int k = 0; k < storage.size(); k++) {
+                            String key = query[0].toLowerCase().trim();
+                            if(storage.get(k).contains(key) && (Integer.valueOf(storage.get(k).get(key)) > Integer.valueOf(query[1].trim()))) {
+                                result_ids.add(k);
+                            }
+                        }
+                    } else if(input.contains("=")) {
+                        String[] query = input.split("\\=");
+                        for (int k = 0; k < storage.size(); k++) {
+                            String key = query[0].toLowerCase().trim();
+                            if(storage.get(k).contains(key) && (Integer.valueOf(storage.get(k).get(key)).equals(Integer.valueOf(query[1].trim())))) {
+                                result_ids.add(k);
+                            }
+                        }
+                    } else {
+                        System.out.printf("I'm sorry but the command you've entered is not valid. Please try again.\n\n>> ");
+                    }
+                    System.out.printf("Number of documents deleted: %d", result_ids.size());
+                    for (int i = result_ids.size() - 1; i >= 0; i--) {
+                        storage.remove((int) result_ids.get(i));
+                    }
+                    System.out.printf("\n\n>> ");
                 } else {
                     System.out.printf("I'm sorry but the command you've entered is not valid. Please try again.\n\n>> ");
                 }
