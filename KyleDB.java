@@ -43,7 +43,7 @@ public class KyleDB {
         Scanner listener = new Scanner(System.in);
         boolean endflag = false;
         while(!(endflag)) {
-            try {
+            // try {
                 String user_input = listener.nextLine();
                 if (user_input.toLowerCase().equals("help".toLowerCase()) || user_input.toLowerCase().equals("h".toLowerCase())) {
                     System.out.printf("\nHelp is on it's way!\n\nTo query the database please use the query command:\n\ndb.CS557.query(condition, field)\n\ncondition -- field_name op value\n    zero or more select conditions. If there is more than one condition they will be separated by an 'and' ('or' will not be included). Zero conditions are denoted with just a comma and a space before the field, and it means include all documents e.g. (, field).\n\nop can be =, <, >\n\nfield -- field_name(s)\n    zero or more field names separated by '+' signs. This operation specifies the list of fields to be displayed.  If there are zero fields, the closing parenthesis is used and it means include all fields for each document that satisfies the condition, including the ID field.  Unlike Mongo DB, the ID field is only included if specified.  If a document does not have a field in the field_name list, but it has other fields appearing in the list, then it should be included in the result.\n\nquery() returns the entire collection, all fields for all documents\n\nExample queries and their results:\n    db.CS557.query(Manager = 555, SNum+Dept)\n    Dept: 10  SNum: 777\n    SNum: 222\n    db.CS557.query(Age > 15 and Manager = 555)\n    ID: 2 Dept: 10  Manager:  555 SNum: 777 Age: 20\n    db.CS557.query(, ID+SNum)\n    ID: 1 SNum: 555\n    ID: 2 SNum: 777\n    ID: 3 SNum: 888\n    ID: 4 SNum: 222\n\nTo use an aggregate query (sum, max, avg):\n    aggregate(field)\n\nExample aggregate queries and their results:\n    db.CS557.sum(Age)\n    48\n    db.CS557.max(SNum)\n    888\n    db.CS557.avg(Age)\n    16\n\nTo get the Cartesian product of two fields:\n    cartprod(f1, f2)\n\nExample of Cartesian product query and its result:\n    db.CS557.cartprod(Dept, Age)\n    DEPT: 5 Age: 20\n    DEPT: 5 Age: 18\n    DEPT: 5 Age: 10\n    DEPT: 10 Age: 20\n    DEPT: 10 Age: 18\n    DEPT: 10 Age: 10\n\n>> ");
@@ -52,7 +52,7 @@ public class KyleDB {
                 } else if(user_input.toLowerCase().equals("show".toLowerCase())) {
                     for (int i = 0; i < storage.size(); i++) {
                         for (int j = 0; j < storage.get(i).size(); j++) {
-                            System.out.printf("%d\t%s: %s\n", i + 1, storage.get(i).get(j).getKey(), storage.get(i).get(j).getValue());
+                            System.out.printf("ID: %d\t%s: %s\n", i, storage.get(i).get(j).getKey(), storage.get(i).get(j).getValue());
                         }
                     }
                     System.out.printf("\n\n>> ");
@@ -111,16 +111,24 @@ public class KyleDB {
                         for (int i = 0; i < result_ids.size(); i++) {
                             String result = "";
                             for (String proj: projections) {
-                                String val = storage.get(result_ids.get(i)).get(proj.toLowerCase().trim());
-                                if(val != null) {
-                                    result += " "+proj.toLowerCase().trim()+": "+val;
+                                if (proj.toLowerCase().trim().equals("ID".toLowerCase())) {
+                                    result += " ID: "+result_ids.get(i);
+                                } else {
+                                    String val = storage.get(result_ids.get(i)).get(proj.toLowerCase().trim());
+                                    if(val != null) {
+                                        result += " "+proj.toLowerCase().trim()+": "+val;
+                                    }
                                 }
                             }
-                            System.out.printf("%s\n",result.substring(1,result.length()));
+                            if(!(result.equals(""))) {
+                                System.out.printf("%s\n",result.substring(1,result.length()));
+                            } else {
+                                System.out.printf("");
+                            }
                         }
                     } else {
                         for (int i = 0; i < result_ids.size(); i++) {
-                            System.out.printf("%s\n", storage.get(result_ids.get(i)));
+                            System.out.printf("ID: %d %s\n", result_ids.get(i), storage.get(result_ids.get(i)));
                         }
                     }
                     System.out.printf("\n\n>> ");
@@ -222,11 +230,11 @@ public class KyleDB {
                     }
                     System.out.printf("\n\n>> ");
                 } else {
-                    System.out.printf("I'm sorry but the command you've entered is not valid. Please try again.\n\n>> ");
+                    System.out.printf("The command you've entered is not valid. Please try again.\n\n>> ");
                 }
-            } catch (StringIndexOutOfBoundsException exce) {
-                System.out.printf("I'm sorry but the command you've entered is not valid. Please try again.\n\n>> ");
-            }
+            // } catch (StringIndexOutOfBoundsException exce) {
+            //     System.out.printf("Incorrect arguments. Please try again.\n\n>> ");
+            // }
         }
     }
 
