@@ -91,7 +91,7 @@ public class KyleDB {
                             String[] query = queries[i].split("\\=");
                             for (int k = 0; k < storage.size(); k++) {
                                 String key = query[0].toLowerCase().trim();
-                                if(storage.get(k).contains(key) &n & (Integer.valueOf(storage.get(k).get(key)) == Integer.valueOf(query[1].trim()))) {
+                                if(storage.get(k).contains(key) && (Integer.valueOf(storage.get(k).get(key)).equals(Integer.valueOf(query[1].trim())))) {
                                     if(firstpass) {
                                         result_ids.add(k);
                                     }
