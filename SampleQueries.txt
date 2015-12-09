@@ -1,0 +1,44 @@
+db.CS557.query(Manager = 555, SNum+Dept)
+            Dept: 10  SNum: 777
+            SNum: 222
+
+db.CS557.query(Age > 15 and Manager = 555)
+            ID: 2 Dept: 10  Manager:  555 SNum: 777 Age: 20
+
+db.CS557.query(, ID+SNum)
+            ID: 1 SNum: 555
+            ID: 2 SNum: 777
+            ID: 3 SNum: 888
+            ID: 4 SNum: 222
+
+db.CS557.query(Agge = 20, SNum)
+            //returns nothing, no Agge field
+
+db.CS557.sum(Age)
+            48
+db.CS557.max(SNum)
+            888
+db.CS557.avg(Age)
+            16
+db.CS557.max(Cost)
+            //returns nothing, no Cost field in any document
+
+db.CS557.cartprod(Dept, Age)
+            DEPT: 5 Age: 20
+            DEPT: 5 Age: 18
+            DEPT: 5 Age: 10
+            DEPT: 10 Age: 20
+            DEPT: 10 Age: 18
+            DEPT: 10 Age: 10
+
+db.CS557.sort(Age)
+            Age: 10 Manager: 555 SNum: 222
+            SNum: 888 Age: 18
+            Dept: 10  Manager: 555 SNum: 777 Age: 20
+            SNum: 555 Dept: 5
+
+db.CS557.delete(Manager = 555)
+            Number of documents deleted:  2
+db.CS557.query()
+            SNum: 555 Dept: 5
+            SNum: 888 Age: 18
