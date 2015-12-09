@@ -225,7 +225,7 @@ public class KyleDB {
                     }
                     System.out.printf("\n>> ");
                 } else if(user_input.toLowerCase().startsWith("db.CS557.sort".toLowerCase()) && user_input.endsWith(")")) {
-                    final String field = user_input.substring(14, user_input.length() - 1);
+                    final String field = user_input.substring(14, user_input.length() - 1).toLowerCase().trim();
                     ArrayList<Document> newStorage = new ArrayList<Document>(storage);
                     Collections.sort(newStorage, new Comparator<Document>() {
                         public int compare(Document d1, Document d2) {

@@ -1,0 +1,31 @@
+db.CS557.query(, OD)
+
+db.CS557.query(, CP2+OD)
+
+db.CS557.query(Age = 20)
+
+db.CS557.query(Age < 21 and Salary > 160000)
+
+db.CS557.query(Age = 20, Spec1+Salary)
+
+db.CS557.query(City = 2 and Gender = 1 and Dept = 3)
+
+db.CS557.query(City = 2 and Gender = 1 and Dept = 3, EID+Age+Salary+Spec1+State)
+
+db.CS557.query(, ZZ)
+
+db.CS557.max(Salary)
+
+db.CS557.sum(CP2)
+
+db.CS557.avg(OD)
+
+db.CS557.cartprod(OD, CP2)
+
+db.test.query(OD)
+
+db.CS557.sort(OD)
+
+db.CS557.delete(Salary < 185000)
+
+db.CS557.query(Salary > 185000)
