@@ -14,12 +14,13 @@ public class KyleDB {
     private static ArrayList<Document> storage = new ArrayList<Document>();
 
     public static void main(String[] args) {
+        int id_counter = 1;
         if (args.length == 1) {
             try {
                 Scanner input = new Scanner(new File(args[0]));
                 while (input.hasNext()) {
                     Scanner line = new Scanner(input.nextLine()).useDelimiter("\\W+");
-                    Document doc = new Document();
+                    Document doc = new Document(id_counter++);
                     while (line.hasNext()) {
                         String next = line.next();
                         next = next.substring(0, next.length());
@@ -51,87 +52,117 @@ public class KyleDB {
                     endflag = true;
                 } else if(user_input.toLowerCase().equals("show".toLowerCase())) {
                     for (int i = 0; i < storage.size(); i++) {
+                        String s = "";
                         for (int j = 0; j < storage.get(i).size(); j++) {
-                            System.out.printf("ID: %d\t%s: %s\n", i, storage.get(i).get(j).getKey(), storage.get(i).get(j).getValue());
+                            s += " "+storage.get(i).get(j).getKey()+": "+storage.get(i).get(j).getValue();
                         }
+                        System.out.printf("%s\n", s.substring(1,s.length()));
                     }
                     System.out.printf("\n\n>> ");
                 } else if(user_input.toLowerCase().startsWith("db.CS557.query".toLowerCase()) && user_input.endsWith(")")) {
-                    String[] fields = user_input.substring(15, user_input.length() - 1).split(",");
-                    String[] queries = fields[0].split("and");
-                    ArrayList<Integer> result_ids = new ArrayList<Integer>();
-                    boolean firstpass = true;
+                    String fields_area = user_input.substring(15, user_input.length() - 1);
+                    if(!(fields_area.equals(""))) {
+                        String[] fields = fields_area.split(",");
+                        String[] queries = fields[0].split("and");
+                        ArrayList<Integer> result_ids = new ArrayList<Integer>();
+                        if(fields[0].length() > 0) {
+                            boolean firstpass = true;
 
-                    for (int i = 0; i < queries.length; i++) {
-                        if(queries[i].contains("<")) {
-                            String[] query = queries[i].split("\\<");
-                            for (int k = 0; k < storage.size(); k++) {
-                                String key = query[0].toLowerCase().trim();
-                                if(storage.get(k).contains(key) && (Integer.valueOf(storage.get(k).get(key)) < Integer.valueOf(query[1].trim()))) {
-                                    if(firstpass) {
-                                        result_ids.add(k);
+                            for (int i = 0; i < queries.length; i++) {
+                                if(queries[i].contains("<")) {
+                                    String[] query = queries[i].split("\\<");
+                                    for (int k = 0; k < storage.size(); k++) {
+                                        String key = query[0].toLowerCase().trim();
+                                        if(storage.get(k).contains(key) && (Integer.valueOf(storage.get(k).get(key)) < Integer.valueOf(query[1].trim()))) {
+                                            if(firstpass) {
+                                                result_ids.add(k);
+                                            }
+                                        } else {
+                                            result_ids.remove(new Integer(k));
+                                        }
+                                    }
+                                } else if(queries[i].contains(">")) {
+                                    String[] query = queries[i].split("\\>");
+                                    for (int k = 0; k < storage.size(); k++) {
+                                        String key = query[0].toLowerCase().trim();
+                                        if(storage.get(k).contains(key) && (Integer.valueOf(storage.get(k).get(key)) > Integer.valueOf(query[1].trim()))) {
+                                            if(firstpass) {
+                                                result_ids.add(k);
+                                            }
+                                        } else {
+                                            result_ids.remove(new Integer(k));
+                                        }
+                                    }
+                                } else if(queries[i].contains("=")) {
+                                    String[] query = queries[i].split("\\=");
+                                    for (int k = 0; k < storage.size(); k++) {
+                                        String key = query[0].toLowerCase().trim();
+                                        if(storage.get(k).contains(key) && (Integer.valueOf(storage.get(k).get(key)).equals(Integer.valueOf(query[1].trim())))) {
+                                            if(firstpass) {
+                                                result_ids.add(k);
+                                            }
+                                        } else {
+                                            result_ids.remove(new Integer(k));
+                                        }
                                     }
                                 } else {
-                                    result_ids.remove(new Integer(k));
+                                    System.out.printf("I'm sorry but the command you've entered is not valid. Please try again.");
                                 }
+                                firstpass = false;
                             }
-                        } else if(queries[i].contains(">")) {
-                            String[] query = queries[i].split("\\>");
-                            for (int k = 0; k < storage.size(); k++) {
-                                String key = query[0].toLowerCase().trim();
-                                if(storage.get(k).contains(key) && (Integer.valueOf(storage.get(k).get(key)) > Integer.valueOf(query[1].trim()))) {
-                                    if(firstpass) {
-                                        result_ids.add(k);
-                                    }
-                                } else {
-                                    result_ids.remove(new Integer(k));
-                                }
-                            }
-                        } else if(queries[i].contains("=")) {
-                            String[] query = queries[i].split("\\=");
-                            for (int k = 0; k < storage.size(); k++) {
-                                String key = query[0].toLowerCase().trim();
-                                if(storage.get(k).contains(key) && (Integer.valueOf(storage.get(k).get(key)).equals(Integer.valueOf(query[1].trim())))) {
-                                    if(firstpass) {
-                                        result_ids.add(k);
-                                    }
-                                } else {
-                                    result_ids.remove(new Integer(k));
-                                }
-                            }
-                        } else {
-                            System.out.printf("I'm sorry but the command you've entered is not valid. Please try again.\n\n>> ");
-                        }
-                        firstpass = false;
-                    }
 
-
-                    if(fields.length == 2) {
-                        String[] projections = fields[1].split("\\+");
-                        for (int i = 0; i < result_ids.size(); i++) {
-                            String result = "";
-                            for (String proj: projections) {
-                                if (proj.toLowerCase().trim().equals("ID".toLowerCase())) {
-                                    result += " ID: "+result_ids.get(i);
-                                } else {
-                                    String val = storage.get(result_ids.get(i)).get(proj.toLowerCase().trim());
-                                    if(val != null) {
-                                        result += " "+proj.toLowerCase().trim()+": "+val;
+                            if(fields.length > 1) {
+                                String[] projections = fields[1].split("\\+");
+                                for (int i = 0; i < result_ids.size(); i++) {
+                                    String result = "";
+                                    for (String proj: projections) {
+                                        String val = storage.get(result_ids.get(i)).get(proj.toLowerCase().trim());
+                                        if(val != null) {
+                                                result += " "+proj.toLowerCase().trim()+": "+val;
+                                        }
+                                    }
+                                    if(!(result.equals(""))) {
+                                        System.out.printf("%s\n",result.substring(1,result.length()));
+                                    } else {
+                                        System.out.printf("");
                                     }
                                 }
-                            }
-                            if(!(result.equals(""))) {
-                                System.out.printf("%s\n",result.substring(1,result.length()));
                             } else {
-                                System.out.printf("");
+                                for (int i = 0; i < result_ids.size(); i++) {
+                                    System.out.printf("%s\n", storage.get(result_ids.get(i)));
+                                }
                             }
+                            System.out.printf("\n\n>> ");
+                        } else {
+                            if(fields[1].length() > 0) {
+                                String[] projections = fields[1].split("\\+");
+                                for (int i = 0; i < storage.size(); i++) {
+                                    String result = "";
+                                    for (String proj: projections) {
+                                        String val = storage.get(i).get(proj.toLowerCase().trim());
+                                        if(val != null) {
+                                                result += " "+proj.toLowerCase().trim()+": "+val;
+                                        }
+                                    }
+                                    if(!(result.equals(""))) {
+                                        System.out.printf("%s\n",result.substring(1,result.length()));
+                                    } else {
+                                        System.out.printf("");
+                                    }
+                                }
+                            } else {
+                                for (int i = 0; i < storage.size(); i++) {
+                                    System.out.printf("%s\n", storage.get(i));
+                                }
+                            }
+                            System.out.printf("\n\n>> ");
                         }
                     } else {
-                        for (int i = 0; i < result_ids.size(); i++) {
-                            System.out.printf("ID: %d %s\n", result_ids.get(i), storage.get(result_ids.get(i)));
+                        for (int i = 0; i < storage.size(); i++) {
+                            System.out.printf("%s\n", storage.get(i));
                         }
+                        System.out.printf("\n\n>> ");
                     }
-                    System.out.printf("\n\n>> ");
                 } else if(user_input.toLowerCase().startsWith("db.CS557.max".toLowerCase()) && user_input.endsWith(")")) {
                     int max = Integer.MIN_VALUE;
                     String field = user_input.substring(13, user_input.length() - 1);
@@ -159,7 +190,11 @@ public class KyleDB {
                             }
                         }
                     }
-                    System.out.printf("%d\n\n>> ",sum/count);
+                    if(count > 0) {
+                        System.out.printf("%d\n\n>> ",sum/count);
+                    } else {
+                        System.out.printf("\n\n>> ");
+                    }
                 } else if(user_input.toLowerCase().startsWith("db.CS557.sum".toLowerCase()) && user_input.endsWith(")")) {
                     int sum = 0;
                     String field = user_input.substring(13, user_input.length() - 1);
@@ -176,10 +211,10 @@ public class KyleDB {
                     if (fields.length == 2) {
                         for (int i = 0; i < storage.size(); i++) {
                             for (int j = 0; j < storage.get(i).size(); j++) {
-                                if(storage.get(i).get(j).getKey().toLowerCase().equals(fields[0].toLowerCase())) {
+                                if(storage.get(i).get(j).getKey().toLowerCase().equals(fields[0].toLowerCase().trim())) {
                                     for (int k = 0; k < storage.size(); k++) {
-                                        for (int l = 0; l < storage.get(i).size(); l++) {
-                                            if(storage.get(k).get(l).getKey().toLowerCase().equals(fields[1].toLowerCase())) {
+                                        for (int l = 0; l < storage.get(k).size(); l++) {
+                                            if(storage.get(k).get(l).getKey().toLowerCase().equals(fields[1].toLowerCase().trim())) {
                                                 System.out.printf("%s: %s %s: %s\n", storage.get(i).get(j).getKey(), storage.get(i).get(j).getValue(), storage.get(k).get(l).getKey(), storage.get(k).get(l).getValue());
                                             }
                                         }
@@ -191,7 +226,30 @@ public class KyleDB {
                     System.out.printf("\n>> ");
                 } else if(user_input.toLowerCase().startsWith("db.CS557.sort".toLowerCase()) && user_input.endsWith(")")) {
                     String field = user_input.substring(14, user_input.length() - 1);
-                    System.out.printf("Sort on %s\n\n>> ",field);
+                    ArrayList<Document> newStorage = new ArrayList<Document>(storage);
+                    Collections.sort(newStorage, new Comparator<Document>() {
+                        public int compare(Document d1, Document d2) {
+                            boolean x = d1.contains(field);
+                            if(x) {
+                                boolean y = d2.contains(field);
+                                if(y) {
+                                    return d1.get(field).compareTo(d2.get(field));
+                                }
+                                return -1;
+                            }
+                            boolean y = d2.contains(field);
+                            if(y) { return 1; }
+                            return 0;
+                        }
+                    });
+                    for (int i = 0; i < newStorage.size(); i++) {
+                        String s = "";
+                        for (int j = 0; j < newStorage.get(i).size(); j++) {
+                            s += " "+newStorage.get(i).get(j).getKey()+": "+newStorage.get(i).get(j).getValue();
+                        }
+                        System.out.printf("%s\n", s.substring(1,s.length()));
+                    }
+                    System.out.printf("\n\n>> ");
                 } else if(user_input.toLowerCase().startsWith("db.CS557.delete".toLowerCase()) && user_input.endsWith(")")) {
                     String input = user_input.substring(16, user_input.length() - 1);
                     ArrayList<Integer> result_ids = new ArrayList<Integer>();
@@ -222,7 +280,7 @@ public class KyleDB {
                             }
                         }
                     } else {
-                        System.out.printf("I'm sorry but the command you've entered is not valid. Please try again.\n\n>> ");
+                        System.out.printf("I'm sorry but the command you've entered is not valid. Please try again.");
                     }
                     System.out.printf("Number of documents deleted: %d", result_ids.size());
                     for (int i = result_ids.size() - 1; i >= 0; i--) {

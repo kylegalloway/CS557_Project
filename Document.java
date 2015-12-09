@@ -4,6 +4,10 @@ public class Document {
     private ArrayList<KVpair> doc_array = new ArrayList<KVpair>();
     private ArrayList<String> keys = new ArrayList<String>();
 
+    Document(int id){
+        this.addPair(new KVpair("id",Integer.toString(id)));
+    }
+
     public void addPair(KVpair kvpair) {
         this.doc_array.add(kvpair);
         this.keys.add(kvpair.getKey());
@@ -28,26 +32,5 @@ public class Document {
             result += " "+pair.getKey()+": "+pair.getValue();
         }
         return result.substring(1,result.length());
-    }
-}
-
-class KVpair {
-    private String key;
-    private String value;
-
-    // Constructor for Product Class
-    public KVpair(String key, String value) {
-        this.key = key.toLowerCase();
-        this.value = value.toLowerCase();
-    } // End constructor
-
-    public String getKey() { return key; }
-    public String getValue() { return value; }
-
-    public int compareTo(KVpair otherPair) {
-        if(this.key.equals(otherPair.getKey().toLowerCase())) {
-            return 1;
-        }
-        return 0;
     }
 }
