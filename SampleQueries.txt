@@ -1,4 +1,17 @@
 db.CS557.query(Manager = 555, SNum+Dept)
+db.CS557.query(Age > 15 and Manager = 555)
+db.CS557.query(, ID+SNum)
+db.CS557.query(Agge = 20, SNum)
+db.CS557.sum(Age)
+db.CS557.max(SNum)
+db.CS557.avg(Age)
+db.CS557.max(Cost)
+db.CS557.cartprod(Dept, Age)
+db.CS557.sort(Age)
+db.CS557.delete(Manager = 555)
+db.CS557.query()
+
+db.CS557.query(Manager = 555, SNum+Dept)
             Dept: 10  SNum: 777
             SNum: 222
 
